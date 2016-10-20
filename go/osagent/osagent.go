@@ -117,6 +117,16 @@ func MySQLBinlogContents(binlogFiles []string, startPosition int64, stopPosition
 	return string(output), err
 }
 
+func StoreContent(content []byte) (*os.File, error) {
+	tmpFile, err := ioutil.TempFile("", "orchestrator-agent-content-")
+	if err != nil {
+		return tmpFile, log.Errore(err)
+	}
+	defer tmpFile.Close()
+	ioutil.WriteFile(tmpFile.Name(), content, 0644)
+	return tmpFile, nil
+}
+
 // Equals tests equality of this corrdinate and another one.
 func (this *LogicalVolume) IsSnapshotValid() bool {
 	if !this.IsSnapshot {

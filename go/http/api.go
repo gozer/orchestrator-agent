@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"path"
@@ -523,6 +524,26 @@ func (this *HttpAPI) BinlogContents(params martini.Params, r render.Render, req 
 	r.JSON(200, output)
 }
 
+// ApplyMySQLStatements reads arbitrary blob of (base64 encoded, gzip compressed) statements and
+// applies them onto mysql
+func (this *HttpAPI) ApplyMySQLStatements(params martini.Params, r render.Render, req *http.Request) {
+	if err := this.validateToken(r, req); err != nil {
+		return
+	}
+
+	content, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		r.JSON(500, &APIResponse{Code: ERROR, Message: err.Error()})
+		return
+	}
+	file, err := osagent.StoreContent(content)
+	if err != nil {
+		r.JSON(500, &APIResponse{Code: ERROR, Message: err.Error()})
+		return
+	}
+	r.JSON(200, file.Name())
+}
+
 func (this *HttpAPI) RunCommand(params martini.Params, r render.Render, req *http.Request) {
 	if err := this.validateToken(r, req); err != nil {
 		return
@@ -578,6 +599,7 @@ func (this *HttpAPI) RegisterRequests(m *martini.ClassicMartini) {
 	m.Get("/api/mysql-relay-log-files", this.RelayLogFiles)
 	m.Get("/api/mysql-binlog-contents", this.BinlogContents)
 	m.Get("/api/mysql-relaylog-contents-tail/:relaylog/:start", this.RelaylogContentsTail)
+	m.Post("/api/mysql-apply-statements", this.ApplyMySQLStatements)
 	m.Get("/api/custom-commands/:cmd", this.RunCommand)
 	m.Get(config.Config.StatusEndpoint, this.Status)
 }
