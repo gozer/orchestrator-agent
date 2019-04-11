@@ -6,7 +6,7 @@ MySQL topology agent (daemon)
 **orchestrator-agent** is a sub-project of [orchestrator](https://github.com/github/orchestrator).
 It is a service that runs on MySQL hosts and communicates with *orchestrator*.
 
-**orchestrator-agent** is capable of proving operating system, file system and LVM information to *orchestrator*, as well
+**orchestrator-agent** is capable of providing operating system, file system and LVM information to *orchestrator*, as well
 as invoke certain commands and scripts.
 
 The primary drive for developing **orchestrator-agent** was [Outbrain](https://github.com/outbrain)'s need for a controlled
@@ -20,10 +20,10 @@ Whether or not **orchestrator-agent** is useful to you depends on your needs.
 ##### Generic functionality offered by **orchestrator-agent**:
 
 - Detection of the MySQL service, starting and stopping (start/stop/status commands provided via configuration)
-- Detection of MySQL port, data directory (assumes configuration is `/etc/my.cnf`)
+- Detection of MySQL port and data directory (assumes configuration is `/etc/my.cnf`)
 - Calculation of disk usage on data directory mount point
 - Tailing the error log file
-- Discovery (the mere existence of the *orchestrator-agent* service on a host may suggest the existence or need of existence of a MySQL service)
+- Discovery (the mere existence of the *orchestrator-agent* service on a host may suggest the existence or need of the existence of a MySQL service)
  
 ##### Specialized functionality offered by **orchestrator-agent**:
 
@@ -41,8 +41,8 @@ At Outbrain we use LVM snapshots. Each MySQL replication topology has designated
 These servers do LVM snapshots daily, and keep such snapshots open for a few days. Thus it is possible that a server
 has, say, 5 open (and unmounted) LVM snapshots at a given time.  
 
-Upon need, we are able to mount any such snapshot in near zero time and restart MySQL on the host using mounted data directory.
-We are thus able to recover any one of few days back at speed of InnoDB crash-recovery.
+Upon need, we are able to mount any such snapshot in near zero time and restart MySQL on the host using the mounted data directory.
+We are thus able to recover any one of a few days back at speed of InnoDB crash-recovery.
 
 This serves two purposes: an immediate recovery/sanity check for destructive operations (unintentional or malicious `UPDATE` or `DROP`)
 as well as a seed source for new/corrupt servers.
@@ -64,14 +64,14 @@ availability of the snapshot along with any metadata required on cluster/DC.
   
 ### The orchestrator & orchestrator-agent architecture
 
-**orchestrator** is a standalone, centralized service/command line tool. When acting as a service, it provides with web API
-and web interface to allow replication topology refactoring, long query control, and more.
+**orchestrator** is a standalone, centralized service/command line tool. When acting as a service, it provides a web API
+and a web interface to allow replication topology refactoring, long query control, and more.
 
 Coupled with **orchestrator-agent**, **orchestrator** is further able to assist in seeding new/corrupt servers. 
 **orchestrator-agent** does not initiate anything by itself, but is in fact controlled by **orchestrator**.
 
 When started, **orchestrator-agent** chooses a random, secret *token* and attempts to connect to the centralized **orchestrator**
-service API (location configurable). It then registers at the **orchestrator** service with its secret token. 
+service API (location configurable). It then registers with the **orchestrator** service with its secret token. 
 
 **orchestrator-agent** then serves via HTTP API, and for all but the simplest commands requires the secret token.
 
@@ -86,8 +86,8 @@ invoked by the centralized **orchestrator** service.
 
 ### Configuration
 
-_Orchestrator-agent_ uses a configuration file, located in either `/etc/orchestrator-agent.conf.json` or 
-relative path to binary `conf/orchestrator-agent.conf.json` or `orchestrator-agent.conf.json`. 
+_Orchestrator-agent_ uses a configuration file, located in either `/etc/orchestrator-agent.conf.json` or in a
+relative path to the binary `conf/orchestrator-agent.conf.json` or `orchestrator-agent.conf.json`. 
 
 Note that the agent will use the config file in its relative conf path first.
 
@@ -153,7 +153,7 @@ An example configuration file may be:
 
 #### Necessary matching configuration on the Orchestrator Server side
 
-If you initially deployed orchestrator with a minimally working configuration, you will need to make some changes on the server side to prepare it for newly deployed agents. The configuration lines needed on the server side to support agents are
+If you initially deployed orchestrator with a minimally working configuration, you will need to make some changes on the server side to prepare it for newly deployed agents. The configuration lines needed on the server side to support agents are:
 
 *  `ServeAgentsHttp`      (bool), Must be set to `true` to get the orchestrator server listening for agents
 *  `AgentsServerPort`     (String), The port on which the server should listen to agents. Shoult match the port you define for agents in `AgentsServer`.
